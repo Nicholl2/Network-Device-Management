@@ -152,9 +152,7 @@ export default function LoginPage() {
                 <span className="text-gray-700">Remember Me</span>
               </label>
 
-              <button className="text-teal-500 hover:text-teal-600">
-                Forgot Password?
-              </button>
+
             </div>
 
             {/* Buttons */}

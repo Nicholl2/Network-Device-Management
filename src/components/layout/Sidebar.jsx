@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { Home, Users, Server, Info } from "lucide-react";
+import { Home, Users, Server, Info, Zap } from "lucide-react";
 
 export default function Sidebar() {
   return (
-    <div className="w-64 bg-white border-r h-screen p-6 flex flex-col">
+    <div className="w-64 bg-white border-r h-screen p-6 flex flex-col overflow-y-auto">
       <h1 className="text-2xl font-bold mb-8 text-blue-600">
-        Network Device Management
+        NDM
       </h1>
 
       <nav className="space-y-3 flex-1">
@@ -30,6 +30,17 @@ export default function Sidebar() {
           }
         >
           <Server /> Network Devices
+        </NavLink>
+
+        <NavLink
+          to="/templates"
+          className={({ isActive }) =>
+            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition ${
+              isActive ? "bg-blue-50 text-blue-600 font-semibold" : ""
+            }`
+          }
+        >
+          <Zap /> Templates
         </NavLink>
 
         <NavLink

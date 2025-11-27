@@ -5,15 +5,15 @@ export default function Sidebar() {
   return (
     <div className="w-64 bg-white border-r h-screen p-6 flex flex-col">
       <h1 className="text-2xl font-bold mb-8 text-blue-600">
-        NDM
+        Network Device Management
       </h1>
 
       <nav className="space-y-3 flex-1">
 
         <NavLink
-          to="/"
+          to="/home"
           className={({ isActive }) =>
-            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 ${
+            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition ${
               isActive ? "bg-blue-50 text-blue-600 font-semibold" : ""
             }`
           }
@@ -24,7 +24,7 @@ export default function Sidebar() {
         <NavLink
           to="/devices"
           className={({ isActive }) =>
-            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 ${
+            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition ${
               isActive ? "bg-blue-50 text-blue-600 font-semibold" : ""
             }`
           }
@@ -35,7 +35,7 @@ export default function Sidebar() {
         <NavLink
           to="/users"
           className={({ isActive }) =>
-            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 ${
+            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition ${
               isActive ? "bg-blue-50 text-blue-600 font-semibold" : ""
             }`
           }
@@ -46,7 +46,7 @@ export default function Sidebar() {
         <NavLink
           to="/about"
           className={({ isActive }) =>
-            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 ${
+            `flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition ${
               isActive ? "bg-blue-50 text-blue-600 font-semibold" : ""
             }`
           }

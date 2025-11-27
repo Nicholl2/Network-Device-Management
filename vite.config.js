@@ -10,17 +10,17 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
 
+      // ❗ Ini tempat yang BENAR untuk preset di V1.x
+      assetsGenerator: {
+        preset: "modern"
+      },
+
       includeAssets: [
         "favicon.ico",
         "robots.txt",
         "apple-touch-icon.png",
         "Logo.png"
       ],
-
-      pwaAssets: {
-        disabled: false,
-        config: true,
-      },
 
       manifest: {
         name: "Network Device Management",

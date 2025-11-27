@@ -18,7 +18,6 @@ export default function RegisterPage() {
   setSuccess('');
 
   try {
-    // 1. CEK JIKA USERNAME SUDAH ADA
     const { data: existingUser } = await supabase
       .from('profiles')
       .select('*')
@@ -29,7 +28,6 @@ export default function RegisterPage() {
       throw new Error("Username sudah digunakan.");
     }
 
-    // 2. DAFTARKAN USER KE AUTH
     const { data: authData, error: signupError } = await supabase.auth.signUp({
       email,
       password
@@ -39,7 +37,6 @@ export default function RegisterPage() {
 
     const userId = authData.user.id;
 
-    // 3. SIMPAN USERNAME KE TABEL PROFILES
     const { error: profileError } = await supabase
       .from('profiles')
       .insert([
@@ -68,7 +65,7 @@ export default function RegisterPage() {
 
 
         {/* Left Illustration Section */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-teal-300 to-teal-400 relative p-10 flex-col justify-between">
+        <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-teal-300 to-teal-400 relative p-10 flex-col justify-between">
 
             {/* Logo - Top Left */}
             <div className="flex items-center gap-3 mb-6">

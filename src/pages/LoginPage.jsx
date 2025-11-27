@@ -18,7 +18,7 @@ export default function LoginPage() {
     setSuccess('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -45,7 +45,7 @@ export default function LoginPage() {
       <div className="bg-white rounded-3xl shadow-xl max-w-6xl w-full flex overflow-hidden">
 
         {/* Left Illustration Section */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-teal-300 to-teal-400 relative p-10 flex-col justify-between">
+        <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-teal-300 to-teal-400 relative p-10 flex-col justify-between">
 
           {/* Logo - Top Left */}
           <div className="flex items-center gap-3 mb-6">
@@ -152,9 +152,7 @@ export default function LoginPage() {
                 <span className="text-gray-700">Remember Me</span>
               </label>
 
-              <button className="text-teal-500 hover:text-teal-600">
-                Forgot Password?
-              </button>
+
             </div>
 
             {/* Buttons */}

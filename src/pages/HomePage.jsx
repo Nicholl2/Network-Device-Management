@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Home, Server, Users, Info } from "lucide-react";
+import Sidebar from "../components/layout/Sidebar";
 import { supabase } from "../lib/supabaseClient";
 import Logo from "../assets/Logo.png";
 
@@ -39,71 +40,31 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <nav className="sticky top-0 bg-white shadow-md z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={Logo} alt="Logo" className="w-10 h-10 rounded-lg" />
-            <h1 className="text-2xl font-bold text-gray-700">Network Device Management</h1>
-          </div>
+    <div className="flex bg-white min-h-screen">
+      <Sidebar />
 
-          <div className="flex items-center gap-8">
-            <Link
-              to="/home"
-              className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition"
-            >
-              <Home className="w-5 h-5" />
-              <span>Home</span>
-            </Link>
-            <Link
-              to="/devices"
-              className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition"
-            >
-              <Server className="w-5 h-5" />
-              <span>Devices</span>
-            </Link>
-            <Link
-              to="/users"
-              className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition"
-            >
-              <Users className="w-5 h-5" />
-              <span>Users</span>
-            </Link>
-            <Link
-              to="/about"
-              className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition"
-            >
-              <Info className="w-5 h-5" />
-              <span>About</span>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <div className="flex-1">
+        {/* Hero Section */}
+        <section className="bg-linear-to-r from-teal-400 to-blue-500 text-white py-20 px-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex-1">
+              <h1 className="text-5xl font-bold mb-4">Network Device Management</h1>
+              <p className="text-xl text-gray-100 mb-8">
+                Kelola semua perangkat jaringan Anda dengan mudah dan aman. Sistem
+                yang sederhana namun powerful untuk network administration.
+              </p>
+              <button className="bg-white text-blue-600 font-semibold px-8 py-3 rounded-xl hover:bg-gray-100 transition">
+                Get Started
+              </button>
+            </div>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-teal-400 to-blue-500 text-white py-20 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex-1">
-            <h1 className="text-5xl font-bold mb-4">
-              Network Device Management
-            </h1>
-            <p className="text-xl text-gray-100 mb-8">
-              Kelola semua perangkat jaringan Anda dengan mudah dan aman. Sistem
-              yang sederhana namun powerful untuk network administration.
-            </p>
-            <button className="bg-white text-blue-600 font-semibold px-8 py-3 rounded-xl hover:bg-gray-100 transition">
-              Get Started
-            </button>
-          </div>
-
-          <div className="flex-1 flex justify-center">
-            <div className="w-64 h-64 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
-              <img src={Logo} alt="Logo" className="w-40 h-40 object-contain" />
+            <div className="flex-1 flex justify-center">
+              <div className="w-64 h-64 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+                <img src={Logo} alt="Logo" className="w-40 h-40 object-contain" />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Devices Dashboard Section */}
       <section className="py-20 px-6 bg-gray-50">
@@ -147,7 +108,7 @@ export default function HomePage() {
             </div>
 
             {/* Add Device Card */}
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-8 rounded-2xl shadow-lg hover:shadow-xl transition cursor-pointer">
+            <div className="bg-linear-to-br from-blue-500 to-blue-600 p-8 rounded-2xl shadow-lg hover:shadow-xl transition cursor-pointer">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-white text-sm font-semibold">New Device</h3>
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white text-xl">
@@ -180,7 +141,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Total Users Card */}
-            <div className="bg-gradient-to-br from-teal-400 to-teal-500 p-8 rounded-2xl shadow-lg text-white">
+            <div className="bg-linear-to-br from-teal-400 to-teal-500 p-8 rounded-2xl shadow-lg text-white">
               <h3 className="text-sm font-semibold mb-4 text-teal-100">
                 Total Users
               </h3>
@@ -228,8 +189,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="py-20 px-6 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+        {/* About Section */}
+      <section className="py-20 px-6 bg-linear-to-r from-gray-900 to-gray-800 text-white">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex justify-center mb-8">
             <img src={Logo} alt="Logo" className="w-24 h-24 rounded-xl" />
@@ -241,10 +202,11 @@ export default function HomePage() {
             fitur-fitur powerful, kelola semua perangkat dengan lebih efisien.
           </p>
           <div className="mt-8 pt-8 border-t border-gray-700">
-            <p className="text-gray-500">© 2024 Network Device Management. All rights reserved.</p>
+            <p className="text-gray-500">© 2025 Network Device Management. All rights reserved.</p>
           </div>
-        </div>
+          </div>
       </section>
+      </div>
     </div>
   );
 }

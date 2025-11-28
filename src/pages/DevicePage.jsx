@@ -66,21 +66,16 @@ export default function DevicePage() {
     try {
       setLoading(true);
 
-      // Load devices
-      const { data: deviceData, error: deviceError } = await supabase
+      const { data: deviceData } = await supabase
         .from("devices")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (deviceError) throw deviceError;
-
-      // Load templates
       const { data: templateData } = await supabase
         .from("device_templates")
         .select("*")
         .order("created_at", { ascending: false });
 
-      // Load users
       const { data: profileData } = await supabase
         .from("profiles")
         .select("id, username");
@@ -110,7 +105,6 @@ export default function DevicePage() {
   const handleAddDevice = async () => {
     const template = selectedTemplate || defaultTemplate;
 
-    // Validate required fields
     const requiredFields = [];
     if (template.require_device_name && !formData.name.trim())
       requiredFields.push("Device Name");
@@ -160,7 +154,6 @@ export default function DevicePage() {
         setEditingId(null);
       } else {
         const { error } = await supabase.from("devices").insert([devicePayload]);
-
         if (error) throw error;
       }
 
@@ -177,7 +170,6 @@ export default function DevicePage() {
 
     try {
       const { error } = await supabase.from("devices").delete().eq("id", id);
-
       if (error) throw error;
       loadData();
     } catch (error) {
@@ -237,6 +229,7 @@ export default function DevicePage() {
             <button
               onClick={() => navigate("/templates")}
               className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition"
+              title="Manage device templates"
             >
               <Zap className="w-5 h-5" />
               Templates
@@ -291,7 +284,6 @@ export default function DevicePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-                {/* Default Template */}
                 <button
                   onClick={() => handleSelectTemplate(null)}
                   className="p-4 border-2 border-gray-200 hover:border-blue-500 rounded-lg text-left transition hover:bg-blue-50"
@@ -308,19 +300,18 @@ export default function DevicePage() {
                   </span>
                 </button>
 
-                {/* Custom Templates */}
-                {templates.map((template) => (
+                {templates.map((tmpl) => (
                   <button
-                    key={template.id}
-                    onClick={() => handleSelectTemplate(template)}
+                    key={tmpl.id}
+                    onClick={() => handleSelectTemplate(tmpl)}
                     className="p-4 border-2 border-gray-200 hover:border-purple-500 rounded-lg text-left transition hover:bg-purple-50"
                   >
                     <h3 className="font-bold text-lg text-gray-800 mb-2">
-                      {template.name}
+                      {tmpl.name}
                     </h3>
-                    {template.description && (
+                    {tmpl.description && (
                       <p className="text-sm text-gray-600 mb-3">
-                        {template.description}
+                        {tmpl.description}
                       </p>
                     )}
                     <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
@@ -437,8 +428,7 @@ export default function DevicePage() {
                   >
                     {statusOptions.map((status) => (
                       <option key={status} value={status}>
-                        {status.charAt(0).toUpperCase() +
-                          status.slice(1)}
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
                       </option>
                     ))}
                   </select>

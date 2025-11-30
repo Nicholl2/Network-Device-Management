@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import Sidebar from "../components/layout/Sidebar";
+ 
 
 export default function UserDetailPage() {
   const userId = window.location.pathname.split("/").pop();
@@ -28,10 +28,7 @@ export default function UserDetailPage() {
   if (!user) return <p>Loading…</p>;
 
   return (
-    <div className="flex bg-[#f8fafc]">
-      <Sidebar />
-
-      <div className="flex-1 p-10">
+    <div className="p-10">
         <h1 className="text-3xl font-bold mb-3">User Detail</h1>
 
         <div className="bg-white p-6 rounded-xl shadow max-w-xl">
@@ -39,7 +36,6 @@ export default function UserDetailPage() {
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Joined:</strong> {new Date(user.created_at).toLocaleDateString()}</p>
         </div>
-      </div>
     </div>
   );
 }

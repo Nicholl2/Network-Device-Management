@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import Sidebar from "../components/layout/Sidebar";
+ 
 import { Plus, Trash2, Edit, Copy } from "lucide-react";
 
 export default function TemplatePage() {
@@ -165,10 +165,7 @@ export default function TemplatePage() {
   };
 
   return (
-    <div className="flex bg-[#f8fafc] min-h-screen">
-      <Sidebar />
-
-      <div className="flex-1 p-10">
+    <div className="p-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -383,7 +380,6 @@ export default function TemplatePage() {
             ))
           )}
         </div>
-      </div>
     </div>
   );
 }

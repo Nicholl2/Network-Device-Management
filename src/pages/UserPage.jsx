@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import Sidebar from "../components/layout/Sidebar";
+ 
 import { Search } from "lucide-react";
 
 export default function UserPage() {
@@ -41,10 +41,7 @@ export default function UserPage() {
   }, []);
 
   return (
-    <div className="flex bg-[#f8fafc]">
-      <Sidebar />
-
-      <div className="flex-1 p-10">
+    <div className="p-10">
         {/* Header */}
         <h1 className="text-3xl font-bold mb-2">Users</h1>
         <p className="text-gray-600 mb-8">List of all registered users.</p>
@@ -99,7 +96,6 @@ export default function UserPage() {
             </tbody>
           </table>
         </div>
-      </div>
     </div>
   );
 }

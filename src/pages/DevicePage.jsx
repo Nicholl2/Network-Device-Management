@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import Sidebar from "../components/layout/Sidebar";
+ 
 import { Plus, Search, Trash2, Edit, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -215,10 +215,7 @@ export default function DevicePage() {
   const template = selectedTemplate || defaultTemplate;
 
   return (
-    <div className="flex bg-[#f8fafc] min-h-screen">
-      <Sidebar />
-
-      <div className="flex-1 p-10">
+    <div className="p-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -598,7 +595,6 @@ export default function DevicePage() {
             </tbody>
           </table>
         </div>
-      </div>
     </div>
   );
 }

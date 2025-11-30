@@ -1,13 +1,10 @@
 import React from "react";
-import Sidebar from "../components/layout/Sidebar";
+
 import Logo from "../assets/Logo.png";
 
 export default function AboutPage() {
   return (
-    <div className="flex bg-[#f8fafc] min-h-screen">
-      <Sidebar />
-
-      <div className="flex-1 p-10">
+    <div className="p-10">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -116,7 +113,6 @@ export default function AboutPage() {
             </button>
           </div>
         </div>
-      </div>
     </div>
   );
 }

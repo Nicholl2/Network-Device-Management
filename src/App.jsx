@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './routes/ProtectedRoute'
+import LayoutWrapper from './components/layout/LayoutWrapper'
 
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -23,7 +24,9 @@ function App() {
           path="/home"
           element={
             <ProtectedRoute>
-              <HomePage />
+              <LayoutWrapper>
+                <HomePage />
+              </LayoutWrapper>
             </ProtectedRoute>
           }
         />
@@ -31,7 +34,9 @@ function App() {
           path="/about"
           element={
             <ProtectedRoute>
-              <AboutPage />
+              <LayoutWrapper>
+                <AboutPage />
+              </LayoutWrapper>
             </ProtectedRoute>
           }
         />
@@ -39,7 +44,9 @@ function App() {
           path="/devices"
           element={
             <ProtectedRoute>
-              <DevicePage />
+              <LayoutWrapper>
+                <DevicePage />
+              </LayoutWrapper>
             </ProtectedRoute>
           }
         />
@@ -47,7 +54,9 @@ function App() {
           path="/templates"
           element={
             <ProtectedRoute>
-              <TemplatePage />
+              <LayoutWrapper>
+                <TemplatePage />
+              </LayoutWrapper>
             </ProtectedRoute>
           }
         />
@@ -55,7 +64,9 @@ function App() {
           path="/users"
           element={
             <ProtectedRoute>
-              <UserPage />
+              <LayoutWrapper>
+                <UserPage />
+              </LayoutWrapper>
             </ProtectedRoute>
           }
         />
@@ -63,7 +74,9 @@ function App() {
           path="/users/:id"
           element={
             <ProtectedRoute>
-              <UserDetailPage />
+              <LayoutWrapper>
+                <UserDetailPage />
+              </LayoutWrapper>
             </ProtectedRoute>
           }
         />

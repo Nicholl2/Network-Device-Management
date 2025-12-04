@@ -18,38 +18,59 @@ export default function RegisterPage() {
   setSuccess('');
 
   try {
-    const { data: existingUser } = await supabase
+    const { data: existingUser, error: checkError } = await supabase
       .from('profiles')
       .select('*')
       .eq('username', username)
       .single();
 
-    if (existingUser) {
+    // single() throws error if no row found, which is OK for registration
+    // We only care if there's a username collision (row was found with no error)
+    if (existingUser && !checkError) {
       throw new Error("Username sudah digunakan.");
     }
 
+    // Use standard signUp flow. Note: by default Supabase may require email
+    // confirmation before the user can sign in. If you need immediate login
+    // without confirmation, call the admin API from a secure server (service
+    // role) instead.
     const { data: authData, error: signupError } = await supabase.auth.signUp({
       email,
-      password
+      password,
     });
 
     if (signupError) throw signupError;
 
-    const userId = authData.user.id;
+    const userId = authData?.user?.id;
 
-    const { error: profileError } = await supabase
+    // Check if there are any profiles yet
+    const { count: profileCount } = await supabase
       .from('profiles')
-      .insert([
-        {
-          id: userId,
-          username: username
-        }
-      ]);
+      .select('id', { count: 'exact' });
 
-    if (profileError) throw profileError;
+    // If we have a user id immediately (depends on Supabase settings), create profile now.
+    // Otherwise the user must confirm their email and sign in; profile creation
+    // can be handled after confirmation via an auth state listener or server-side.
+    if (userId) {
+      const role = profileCount === 0 ? 'admin' : 'observer';
 
-    setSuccess('Account created successfully! Redirecting...');
-    setTimeout(() => (window.location.href = '/login'), 1200);
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            id: userId,
+            username: username,
+            role: role,
+          },
+        ]);
+
+      if (profileError) throw profileError;
+
+      setSuccess(`Account created successfully as ${role}! Redirecting...`);
+      setTimeout(() => (window.location.href = '/login'), 1200);
+    } else {
+      setSuccess('Account created. Please check your email to confirm your account before logging in.');
+    }
 
   } catch (err) {
     setError(err.message);

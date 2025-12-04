@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home, Server, Info, Users, LogOut } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
+import { useUserRole } from "../../hooks/useUserRole";
 
 export default function BottomNavbar() {
   const [showMenu, setShowMenu] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,11 +20,10 @@ export default function BottomNavbar() {
         const { data } = await supabase.auth.getUser();
         const authUser = data?.user;
         if (authUser && mounted) {
-          // try to get profile (username) from profiles table
           try {
             const { data: profile } = await supabase
               .from("profiles")
-              .select("username")
+              .select("username, role")
               .eq("id", authUser.id)
               .single();
 
@@ -30,9 +31,10 @@ export default function BottomNavbar() {
               id: authUser.id,
               email: authUser.email,
               username: profile?.username || authUser.email.split("@")[0],
+              role: profile?.role || "observer",
             });
           } catch {
-            setUser({ id: authUser.id, email: authUser.email, username: authUser.email.split("@")[0] });
+            setUser({ id: authUser.id, email: authUser.email, username: authUser.email.split("@")[0], role: "observer" });
           }
         }
       } catch (err) {
@@ -78,10 +80,13 @@ export default function BottomNavbar() {
           <span className="text-xs font-semibold">Devices</span>
         </NavLink>
 
-        <NavLink to="/users" className={navLinkClass}>
-          <Users className="w-6 h-6" />
-          <span className="text-xs font-semibold">Users</span>
-        </NavLink>
+        {/* Show Users link only for admin */}
+        {isAdmin && (
+          <NavLink to="/users" className={navLinkClass}>
+            <Users className="w-6 h-6" />
+            <span className="text-xs font-semibold">Users</span>
+          </NavLink>
+        )}
 
         <NavLink to="/about" className={navLinkClass}>
           <Info className="w-6 h-6" />
@@ -111,6 +116,7 @@ export default function BottomNavbar() {
                   <div className="mb-3">
                     <p className="font-semibold text-gray-800">{user.username}</p>
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    <p className="text-xs text-gray-400 mt-1">{user.role === 'admin' ? '👑 Admin' : '👁️ Observer'}</p>
                   </div>
                 ) : (
                   <div className="mb-3">

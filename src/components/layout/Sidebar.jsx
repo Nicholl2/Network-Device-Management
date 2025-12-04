@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home, Server, Info, Users, Menu, ChevronLeft, LogOut } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
+import { useUserRole } from "../../hooks/useUserRole";
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function Sidebar() {
       if (authUser) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("username")
+          .select("username, role")
           .eq("id", authUser.id)
           .single();
 
@@ -28,6 +30,7 @@ export default function Sidebar() {
           id: authUser.id,
           email: authUser.email,
           username: profile?.username || "User",
+          role: profile?.role || "observer",
         });
       }
     } catch (error) {
@@ -99,10 +102,13 @@ export default function Sidebar() {
             {!collapsed && <span>Network Devices</span>}
           </NavLink>
 
-          <NavLink to="/users" className={linkClass}>
-            <Users className="w-5 h-5" />
-            {!collapsed && <span>Users</span>}
-          </NavLink>
+          {/* Show Users menu only for admin */}
+          {isAdmin && (
+            <NavLink to="/users" className={linkClass}>
+              <Users className="w-5 h-5" />
+              {!collapsed && <span>Users</span>}
+            </NavLink>
+          )}
 
           <NavLink to="/about" className={linkClass}>
             <Info className="w-5 h-5" />
@@ -125,7 +131,7 @@ export default function Sidebar() {
                     {user.username}
                   </p>
                   <p className="text-xs text-gray-500 truncate">
-                    {user.email}
+                    {user.role === 'admin' ? '👑 Admin' : '👁️ Observer'}
                   </p>
                 </div>
               )}

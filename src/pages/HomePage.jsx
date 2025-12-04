@@ -2,12 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Home, Server, Users, Info } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
+import { useUserRole } from "../hooks/useUserRole";
 import Logo from "../assets/Logo.png";
 
 export default function HomePage() {
+  const { user, isAdmin, loading: roleLoading } = useUserRole();
   const [devices, setDevices] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    console.log("HomePage - user:", user, "isAdmin:", isAdmin, "roleLoading:", roleLoading);
+  }, [user, isAdmin, roleLoading]);
 
   useEffect(() => {
     loadData();

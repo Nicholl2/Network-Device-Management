@@ -23,6 +23,7 @@ export default function UserDetailPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!user) return <p>Loading…</p>;

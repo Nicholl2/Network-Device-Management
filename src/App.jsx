@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './routes/ProtectedRoute'
+import RoleProtectedRoute from './routes/RoleProtectedRoute'
 import LayoutWrapper from './components/layout/LayoutWrapper'
 
 import LoginPage from './pages/LoginPage'
@@ -19,7 +20,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* protected routes */}
+        {/* protected routes - available for all authenticated users */}
         <Route
           path="/home"
           element={
@@ -50,13 +51,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Admin only routes */}
         <Route
           path="/templates"
           element={
             <ProtectedRoute>
-              <LayoutWrapper>
-                <TemplatePage />
-              </LayoutWrapper>
+              <RoleProtectedRoute requiredRole="admin">
+                <LayoutWrapper>
+                  <TemplatePage />
+                </LayoutWrapper>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -64,9 +69,11 @@ function App() {
           path="/users"
           element={
             <ProtectedRoute>
-              <LayoutWrapper>
-                <UserPage />
-              </LayoutWrapper>
+              <RoleProtectedRoute requiredRole="admin">
+                <LayoutWrapper>
+                  <UserPage />
+                </LayoutWrapper>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -74,9 +81,11 @@ function App() {
           path="/users/:id"
           element={
             <ProtectedRoute>
-              <LayoutWrapper>
-                <UserDetailPage />
-              </LayoutWrapper>
+              <RoleProtectedRoute requiredRole="admin">
+                <LayoutWrapper>
+                  <UserDetailPage />
+                </LayoutWrapper>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />

@@ -161,7 +161,6 @@ export default function TemplatePage() {
       show_assigned_to: true,
       require_assigned_to: false,
     });
-    setShowForm(false);
   };
 
   return (
@@ -174,9 +173,9 @@ export default function TemplatePage() {
           </div>
           <button
             onClick={() => {
-              setShowForm(!showForm);
               setEditingId(null);
               resetForm();
+              setShowForm(true);
             }}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition"
           >

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
  
-import { Plus, Search, Trash2, Edit, Zap } from "lucide-react";
+import { Plus, Search, Trash2, Edit, Zap, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function DevicePage() {
@@ -15,6 +15,18 @@ export default function DevicePage() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [search, setSearch] = useState("");
+  const [showColumnsMenu, setShowColumnsMenu] = useState(false);
+
+  const defaultColumns = {
+    name: true,
+    ip_address: true,
+    device_type: true,
+    manufacturer: true,
+    status: true,
+    assigned_to: true,
+  };
+
+  const [columns, setColumns] = useState(defaultColumns);
 
   const defaultTemplate = {
     name: "Default",
@@ -61,6 +73,23 @@ export default function DevicePage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("devices_table_columns");
+      if (saved) setColumns(JSON.parse(saved));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("devices_table_columns", JSON.stringify(columns));
+    } catch {
+      // ignore
+    }
+  }, [columns]);
 
   const loadData = async () => {
     try {
@@ -510,16 +539,65 @@ export default function DevicePage() {
           </div>
         )}
 
-        {/* Search */}
-        <div className="relative max-w-md mb-6">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5" />
-          <input
-            type="text"
-            placeholder="Cari device..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 pr-4 py-3 w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          />
+        {/* Search + Columns */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="relative max-w-md flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5" />
+            <input
+              type="text"
+              placeholder="Cari device..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 pr-4 py-3 w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            />
+          </div>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowColumnsMenu(!showColumnsMenu)}
+              className="flex items-center gap-2 px-4 py-2 border rounded-lg bg-white hover:bg-gray-50"
+              title="Tampilkan kolom"
+            >
+              <Settings className="w-4 h-4 text-gray-600" />
+              <span className="text-sm text-gray-700">Columns</span>
+            </button>
+
+            {showColumnsMenu && (
+              <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-lg z-40 p-4">
+                <h3 className="font-semibold mb-2">Show columns</h3>
+                <div className="flex flex-col gap-2">
+                  {Object.entries({
+                    name: "Name",
+                    ip_address: "IP Address",
+                    device_type: "Type",
+                    manufacturer: "Manufacturer",
+                    status: "Status",
+                    assigned_to: "Assigned To",
+                  }).map(([key, label]) => (
+                    <label key={key} className="inline-flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={!!columns[key]}
+                        onChange={() =>
+                          setColumns((prev) => ({ ...prev, [key]: !prev[key] }))
+                        }
+                        className="form-checkbox h-4 w-4 text-blue-600"
+                      />
+                      <span className="text-sm text-gray-700">{label}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <button
+                    onClick={() => setShowColumnsMenu(false)}
+                    className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 text-sm"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Table */}
@@ -527,54 +605,58 @@ export default function DevicePage() {
           <table className="w-full">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-4 text-left font-semibold">Name</th>
-                <th className="p-4 text-left font-semibold">IP Address</th>
-                <th className="p-4 text-left font-semibold">Type</th>
-                <th className="p-4 text-left font-semibold">Manufacturer</th>
-                <th className="p-4 text-left font-semibold">Status</th>
-                <th className="p-4 text-left font-semibold">Assigned To</th>
+                {columns.name && <th className="p-4 text-left font-semibold">Name</th>}
+                {columns.ip_address && <th className="p-4 text-left font-semibold">IP Address</th>}
+                {columns.device_type && <th className="p-4 text-left font-semibold">Type</th>}
+                {columns.manufacturer && <th className="p-4 text-left font-semibold">Manufacturer</th>}
+                {columns.status && <th className="p-4 text-left font-semibold">Status</th>}
+                {columns.assigned_to && <th className="p-4 text-left font-semibold">Assigned To</th>}
                 <th className="p-4 text-left font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="p-4 text-center text-gray-500">
+                  <td colSpan={Object.values(columns).filter(Boolean).length + 1} className="p-4 text-center text-gray-500">
                     Loading...
                   </td>
                 </tr>
               ) : filteredDevices.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="p-4 text-center text-gray-500">
+                  <td colSpan={Object.values(columns).filter(Boolean).length + 1} className="p-4 text-center text-gray-500">
                     No devices found
                   </td>
                 </tr>
               ) : (
                 filteredDevices.map((device) => (
                   <tr key={device.id} className="hover:bg-gray-50 border-t">
-                    <td className="p-4 font-medium">{device.name}</td>
-                    <td className="p-4 text-sm">{device.ip_address || "-"}</td>
-                    <td className="p-4 text-sm">{device.device_type || "-"}</td>
-                    <td className="p-4 text-sm">{device.manufacturer || "-"}</td>
-                    <td className="p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                          device.status === "stock"
-                            ? "bg-green-100 text-green-800"
-                            : device.status === "dipakai"
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {device.status}
-                      </span>
-                    </td>
-                    <td className="p-4 text-sm">
-                      {device.assigned_to
-                        ? users.find((u) => u.id === device.assigned_to)
-                            ?.username || "-"
-                        : "-"}
-                    </td>
+                    {columns.name && <td className="p-4 font-medium">{device.name}</td>}
+                    {columns.ip_address && <td className="p-4 text-sm">{device.ip_address || "-"}</td>}
+                    {columns.device_type && <td className="p-4 text-sm">{device.device_type || "-"}</td>}
+                    {columns.manufacturer && <td className="p-4 text-sm">{device.manufacturer || "-"}</td>}
+                    {columns.status && (
+                      <td className="p-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            device.status === "stock"
+                              ? "bg-green-100 text-green-800"
+                              : device.status === "dipakai"
+                              ? "bg-orange-100 text-orange-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {device.status}
+                        </span>
+                      </td>
+                    )}
+                    {columns.assigned_to && (
+                      <td className="p-4 text-sm">
+                        {device.assigned_to
+                          ? users.find((u) => u.id === device.assigned_to)
+                              ?.username || "-"
+                          : "-"}
+                      </td>
+                    )}
                     <td className="p-4 flex gap-2">
                       <button
                         onClick={() => handleEditDevice(device)}

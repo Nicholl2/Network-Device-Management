@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { Plus, Search, Trash2, Edit, Zap, Settings, RotateCcw, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../lib/authService";
 
 export default function DevicePage() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function DevicePage() {
   const [editingId, setEditingId] = useState(null);
   const [search, setSearch] = useState("");
   const [showColumnsMenu, setShowColumnsMenu] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
   const defaultColumns = {
     name: true,
@@ -72,7 +74,17 @@ export default function DevicePage() {
 
   useEffect(() => {
     loadData();
+    getUserRole();
   }, []);
+
+  const getUserRole = async () => {
+    try {
+      const user = await authService.getCurrentUserWithRole();
+      setUserRole(user?.role || null);
+    } catch (error) {
+      console.error("Error getting user role:", error);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -261,7 +273,7 @@ export default function DevicePage() {
     .filter(
       (d) =>
         d.name.toLowerCase().includes(search.toLowerCase()) ||
-        d.ip_address.includes(search)
+        (d.ip_address && d.ip_address.includes(search))
     );
 
   const template = selectedTemplate || defaultTemplate;
@@ -295,7 +307,7 @@ export default function DevicePage() {
             <Zap className="w-5 h-5" />
             Templates
           </button>
-          {!showTrash && (
+          {!showTrash && userRole === 'admin' && (
             <button
               onClick={handleStartAddDevice}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition"

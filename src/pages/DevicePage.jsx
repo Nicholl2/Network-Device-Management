@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { Plus, Search, Trash2, Edit, Zap, Settings } from "lucide-react";
+import { Plus, Search, Trash2, Edit, Zap, Settings, RotateCcw, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function DevicePage() {
@@ -26,6 +26,7 @@ export default function DevicePage() {
   };
 
   const [columns, setColumns] = useState(defaultColumns);
+  const [showTrash, setShowTrash] = useState(false);
 
   const defaultTemplate = {
     name: "Default",
@@ -186,9 +187,39 @@ export default function DevicePage() {
   };
 
   const handleDeleteDevice = async (id) => {
-    if (!confirm("Yakin ingin menghapus device ini?")) return;
+    if (!confirm("Yakin ingin menghapus device ini? Device akan masuk ke Trash.")) return;
     try {
-      const { error } = await supabase.from("devices").delete().eq("id", id);
+      const { error } = await supabase
+        .from("devices")
+        .update({ soft_delete_date: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+      loadData();
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
+
+  const handleRestoreDevice = async (id) => {
+    try {
+      const { error } = await supabase
+        .from("devices")
+        .update({ soft_delete_date: null })
+        .eq("id", id);
+      if (error) throw error;
+      loadData();
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
+
+  const handlePermanentDelete = async (id) => {
+    if (!confirm("Yakin ingin menghapus permanent device ini? Tidak bisa dikembalikan!")) return;
+    try {
+      const { error } = await supabase
+        .from("devices")
+        .delete()
+        .eq("id", id);
       if (error) throw error;
       loadData();
     } catch (error) {
@@ -225,11 +256,13 @@ export default function DevicePage() {
     });
   };
 
-  const filteredDevices = devices.filter(
-    (d) =>
-      d.name.toLowerCase().includes(search.toLowerCase()) ||
-      d.ip_address.includes(search)
-  );
+  const filteredDevices = devices
+    .filter((d) => (showTrash ? d.soft_delete_date : !d.soft_delete_date))
+    .filter(
+      (d) =>
+        d.name.toLowerCase().includes(search.toLowerCase()) ||
+        d.ip_address.includes(search)
+    );
 
   const template = selectedTemplate || defaultTemplate;
 
@@ -243,6 +276,18 @@ export default function DevicePage() {
         </div>
         <div className="flex gap-4">
           <button
+            onClick={() => setShowTrash(!showTrash)}
+            className={`${
+              showTrash
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-gray-600 hover:bg-gray-700"
+            } text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition`}
+            title={showTrash ? "Show active devices" : "Show trash"}
+          >
+            <Trash className="w-5 h-5" />
+            {showTrash ? "Trash" : "Devices"}
+          </button>
+          <button
             onClick={() => navigate("/templates")}
             className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition"
             title="Manage device templates"
@@ -250,41 +295,54 @@ export default function DevicePage() {
             <Zap className="w-5 h-5" />
             Templates
           </button>
-          <button
-            onClick={handleStartAddDevice}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition"
-          >
-            <Plus className="w-5 h-5" />
-            Add Device
-          </button>
+          {!showTrash && (
+            <button
+              onClick={handleStartAddDevice}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition"
+            >
+              <Plus className="w-5 h-5" />
+              Add Device
+            </button>
+          )}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow">
-          <p className="text-gray-600 text-sm">Total</p>
-          <p className="text-4xl font-bold text-blue-600">{devices.length}</p>
+      {!showTrash && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-xl shadow">
+            <p className="text-gray-600 text-sm">Total</p>
+            <p className="text-4xl font-bold text-blue-600">
+              {devices.filter((d) => !d.soft_delete_date).length}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow">
+            <p className="text-gray-600 text-sm">Stock</p>
+            <p className="text-4xl font-bold text-green-600">
+              {devices.filter((d) => !d.soft_delete_date && d.status === "stock").length}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow">
+            <p className="text-gray-600 text-sm">Dipakai</p>
+            <p className="text-4xl font-bold text-orange-600">
+              {devices.filter((d) => !d.soft_delete_date && d.status === "dipakai").length}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow">
+            <p className="text-gray-600 text-sm">Rusak</p>
+            <p className="text-4xl font-bold text-red-600">
+              {devices.filter((d) => !d.soft_delete_date && d.status === "rusak").length}
+            </p>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow">
-          <p className="text-gray-600 text-sm">Stock</p>
-          <p className="text-4xl font-bold text-green-600">
-            {devices.filter((d) => d.status === "stock").length}
+      )}
+      {showTrash && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+          <p className="text-yellow-800">
+            <strong>Trash:</strong> {devices.filter((d) => d.soft_delete_date).length} devices in trash
           </p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow">
-          <p className="text-gray-600 text-sm">Dipakai</p>
-          <p className="text-4xl font-bold text-orange-600">
-            {devices.filter((d) => d.status === "dipakai").length}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow">
-          <p className="text-gray-600 text-sm">Rusak</p>
-          <p className="text-4xl font-bold text-red-600">
-            {devices.filter((d) => d.status === "rusak").length}
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* Template Selection Modal */}
       {showTemplateSelection && (
@@ -588,18 +646,39 @@ export default function DevicePage() {
                     </td>
                   )}
                   <td className="p-4 flex gap-2">
-                    <button
-                      onClick={() => handleEditDevice(device)}
-                      className="text-blue-600 hover:text-blue-800 transition"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteDevice(device.id)}
-                      className="text-red-600 hover:text-red-800 transition"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                    {showTrash ? (
+                      <>
+                        <button
+                          onClick={() => handleRestoreDevice(device.id)}
+                          className="text-green-600 hover:text-green-800 transition"
+                          title="Restore device"
+                        >
+                          <RotateCcw className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handlePermanentDelete(device.id)}
+                          className="text-red-600 hover:text-red-800 transition"
+                          title="Permanently delete"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleEditDevice(device)}
+                          className="text-blue-600 hover:text-blue-800 transition"
+                        >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteDevice(device.id)}
+                          className="text-red-600 hover:text-red-800 transition"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))

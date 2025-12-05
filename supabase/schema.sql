@@ -7,9 +7,12 @@ ALTER TABLE devices ADD COLUMN IF NOT EXISTS manufacturer TEXT;
 ALTER TABLE devices ADD COLUMN IF NOT EXISTS model TEXT;
 ALTER TABLE devices ADD COLUMN IF NOT EXISTS assigned_to UUID REFERENCES auth.users(id);
 ALTER TABLE devices ADD COLUMN IF NOT EXISTS template_id UUID;
+ALTER TABLE devices ADD COLUMN IF NOT EXISTS soft_delete_date TIMESTAMP WITH TIME ZONE;
 
 ALTER TABLE devices DROP COLUMN IF EXISTS status;
 ALTER TABLE devices ADD COLUMN status TEXT DEFAULT 'stock' CHECK (status IN ('dipakai', 'rusak', 'stock'));
+
+CREATE INDEX IF NOT EXISTS idx_devices_soft_delete_date ON devices(soft_delete_date);
 
 CREATE TABLE IF NOT EXISTS device_templates (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
